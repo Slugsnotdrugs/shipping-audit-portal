@@ -25,7 +25,6 @@ if run_audit and api_token:
             st.success(f"Audit Complete: {len(orders)} orders analyzed.")
             
             for order in orders:
-                # Logic: Check if it's late (simulated for now)
                 is_late = order['fulfillment_status'] == 'fulfilled'
                 
                 with st.container():
@@ -35,7 +34,13 @@ if run_audit and api_token:
                     
                     if is_late:
                         col3.error("⚠️ LATE")
-                        col4.button(f"Generate Refund Claim for #{order['order_number']}")
+                        # The "Email Brain" logic
+                        tracking = order.get('tracking_number', 'TEST12345')
+                        email_body = f"Hello, I am requesting a refund for Order #{order['order_number']} (Tracking: {tracking}). This shipment exceeded the guaranteed delivery window."
+                        
+                        if col4.button(f"Generate Refund Email for #{order['order_number']}"):
+                            st.info("**Copy this email for the carrier:**")
+                            st.code(email_body)
                     else:
                         col3.success("✅ ON TIME")
         else:
